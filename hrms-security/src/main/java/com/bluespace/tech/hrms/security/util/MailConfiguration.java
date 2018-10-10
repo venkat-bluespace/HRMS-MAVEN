@@ -12,7 +12,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @Configuration
-@PropertySource("file:resources/mail.properties")
+@PropertySource("file:src/main/resources/mail.properties")
 public class MailConfiguration {
 	@Value("${mail.config.protocol}")
 	private String mailProtocol;

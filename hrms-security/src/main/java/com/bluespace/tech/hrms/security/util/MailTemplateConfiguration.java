@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Configuration
-@PropertySource("file:resources/mail_template.properties")
+@PropertySource("file:src/main/resources/mail_template.properties")
 public class MailTemplateConfiguration {
 
 	@Value("${footer.light-text}")

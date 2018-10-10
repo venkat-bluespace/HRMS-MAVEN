@@ -26,7 +26,7 @@ import com.mongodb.client.MongoDatabase;
 @ComponentScan(basePackages = "com.bluespace.tech.hrms")
 /*@ComponentScan({ "com.bluespace.tech.hrms", "com.bluespace.tech.hrms.repositories", "com.bluespace.tech.hrms.domain",
 	"com.bluespace.tech.hrms.services", "com.bluespace.tech.hrms.endpoint" })*/
-@PropertySource("file:resources/application.properties")
+@PropertySource("file:src/main/resources/application.properties")
 @EnableMongoRepositories(basePackages = "com.bluespace.tech.hrms.repositories")
 public class MongoConfig extends AbstractMongoConfiguration {
 
