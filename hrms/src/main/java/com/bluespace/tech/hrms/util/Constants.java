@@ -1,4 +1,4 @@
-package com.bluespace.tech.hrms.util.constants;
+package com.bluespace.tech.hrms.util;
 
 public final class Constants {
 

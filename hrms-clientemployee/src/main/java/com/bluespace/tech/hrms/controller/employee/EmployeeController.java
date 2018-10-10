@@ -41,7 +41,7 @@ public class EmployeeController {
 			Client client = new Client();
 			clientName = client.getClientName();
 		} catch (MongoException e) {
-			logger.error("The client with this " + clientName + "does not exist");
+			logger.error("Client " + clientName + " does not exist in the system.");
 		}
 		return clientName;
 	}

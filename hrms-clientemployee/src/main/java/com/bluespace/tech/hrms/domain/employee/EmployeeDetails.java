@@ -5,6 +5,7 @@ import java.util.Date;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class EmployeeDetails {
 
 	@Id private ObjectId _id;
-	private long employeeId;
+	@Indexed private long employeeId;
 	private String firstName;
 	private String middleName;
 	private String lastName;

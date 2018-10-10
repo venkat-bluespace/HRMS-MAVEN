@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.bluespace.tech.hrms.util.constants.Constants;
+import com.bluespace.tech.hrms.util.Constants;
 
 @RestController
 public class FileAttachmentController {
