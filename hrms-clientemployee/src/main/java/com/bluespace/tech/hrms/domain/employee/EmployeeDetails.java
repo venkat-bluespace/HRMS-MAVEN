@@ -1,6 +1,7 @@
 package com.bluespace.tech.hrms.domain.employee;
 
 import java.util.Date;
+import java.util.List;
 
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
@@ -49,8 +50,8 @@ public class EmployeeDetails {
 	private Date hireDate;
 	private Date terminationDate;
 	private Date employmentLastDate;
-	@DBRef private Client client;
-	@DBRef private CurrentStatus currentStatus;
+	@DBRef private List<Client> client;
+	@DBRef private List<CurrentStatus> currentStatus;
 	private String jobTitle;
 	private String organisation;
 	private String department;

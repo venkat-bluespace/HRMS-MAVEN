@@ -10,6 +10,10 @@ public abstract interface EmployeeService {
 
 	public abstract EmployeeDetails getEmployeeById(long employeeId);
 
-	public abstract List<EmployeeDetails> getEmployeesList();
+	public abstract List<EmployeeDetails> getAllEmployees();
+	
+	public abstract EmployeeDetails updateEmployee(EmployeeDetails employeeDetails);
+	
+	public abstract EmployeeDetails deleteByEmployeeId(EmployeeDetails employeeDetails, long employeeId);
 
 }

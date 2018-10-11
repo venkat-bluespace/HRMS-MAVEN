@@ -74,14 +74,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 				new Update().inc("employeeId", 1), options().returnNew(true).upsert(true), EmployeeDetails.class);
 		return employeeIdCounter.getEmployeeId();
 	}
-	
+
 	public EmployeeDetails createNewEmployee(@ModelAttribute EmployeeDetails newEmployee) {
 		try {
-/*			MongoDatabase db = mongoConfig.db();
+			/*MongoDatabase db = mongoConfig.db();
 			MongoCollection<Document> collection = db.getCollection("employeeDetails");*/
-			
-//			newEmployee.setEmployeeId(this.getNextSequence("counter"));
-			Calendar currentTime = Calendar.getInstance();
+			 
+//			newEmployee.setEmployeeId(this.getNextSequence("counters"));
+			Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 			newEmployee.setCreatedOn(currentTime.getTime());
 			return employeeRepository.save(newEmployee);
 		} catch (MongoException e) {
@@ -90,6 +90,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 //			mongoClient.close();
 		}
 //		return newEmployee;
+/*		Calendar currentTime = Calendar.getInstance();
+		newEmployee.setCreatedOn(currentTime.getTime());*/
 		return employeeRepository.save(newEmployee);
 	}
 
@@ -98,8 +100,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return employeeRepository.getEmployeeByEmployeeId(employeeId);
 	}
 
-	public List<EmployeeDetails> getEmployeesList() {
+	@Override
+	public List<EmployeeDetails> getAllEmployees() {
 		return employeeRepository.findAll();
 	}
 
+	@Override
+	public EmployeeDetails updateEmployee(@ModelAttribute EmployeeDetails employeeDetails) {
+		employeeRepository.save(employeeDetails);
+		return employeeDetails;
+	}
+
+	@Override
+	public EmployeeDetails deleteByEmployeeId(@ModelAttribute EmployeeDetails employeeDetails, long employeeId) {
+		Boolean status = false;
+		Boolean empStatus = employeeDetails.isActive();
+		if (!empStatus.equals(status))
+			employeeDetails.setActive(false);
+		return employeeRepository.deleteEmployeeByEmployeeId(employeeId);
+	}
 }
