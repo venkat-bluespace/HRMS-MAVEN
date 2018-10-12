@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.bluespace.tech.hrms.domain.employee.EmployeeDetails;
 
 @Repository("employeeService")
-public interface EmployeeRepository extends MongoRepository<EmployeeDetails, String> {
+public interface EmployeeRepository extends MongoRepository<EmployeeDetails, Long> {
 
 	public abstract EmployeeDetails findByEmailId(String paramString);
 

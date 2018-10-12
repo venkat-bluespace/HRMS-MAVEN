@@ -14,6 +14,6 @@ public abstract interface EmployeeService {
 	
 	public abstract EmployeeDetails updateEmployee(EmployeeDetails employeeDetails);
 	
-	public abstract EmployeeDetails deleteByEmployeeId(EmployeeDetails employeeDetails, long employeeId);
+	public abstract void deleteByEmployeeId(long employeeId);
 
 }

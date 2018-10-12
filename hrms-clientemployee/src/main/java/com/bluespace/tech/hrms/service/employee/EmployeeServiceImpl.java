@@ -1,21 +1,22 @@
 package com.bluespace.tech.hrms.service.employee;
 
+import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.bson.Document;
-import org.bson.types.ObjectId;
+import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.aggregation.DateOperators.IsoDateFromParts;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+
 import static org.springframework.data.mongodb.core.query.Query.query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -30,7 +31,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.UpdateOptions;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -43,8 +44,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Autowired private MongoOperations mongoOp; 
 	
-	private static MongoClient mongoClient = null;
-
+	@Autowired private MongoClient mongoClient;
 
 /*	public static Object getNextSequence(String name) throws Exception {
 //		mongoClient = new MongoClient( "localhost" , 27017 );
@@ -112,11 +112,20 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public EmployeeDetails deleteByEmployeeId(@ModelAttribute EmployeeDetails employeeDetails, long employeeId) {
-		Boolean status = false;
-		Boolean empStatus = employeeDetails.isActive();
-		if (!empStatus.equals(status))
-			employeeDetails.setActive(false);
-		return employeeRepository.deleteEmployeeByEmployeeId(employeeId);
+	public void deleteByEmployeeId(long employeeId) {
+		mongoClient = new MongoClient("localhost", 27017);
+		MongoDatabase db = mongoConfig.db();
+		MongoCollection<org.bson.Document> collection = db.getCollection("employeeDetails");
+		try {
+			BasicDBObject newDocument = new BasicDBObject();
+			newDocument.append("$set", new BasicDBObject().append("active", false));
+			BasicDBObject searchQuery = new BasicDBObject().append("employeeId", employeeId);
+			Query deleteQuery = new Query();
+			deleteQuery.addCriteria(Criteria.where("employeeId").is(employeeId))
+			.addCriteria(Criteria.where("active").exists(true));
+			collection.updateOne((Bson) deleteQuery, newDocument, new UpdateOptions().upsert(false));
+		} catch (Exception e) {
+			logger.error("There was no value found and hence failed with the exception: " + e);
+		}
 	}
 }

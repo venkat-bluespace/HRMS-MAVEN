@@ -15,11 +15,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -91,6 +93,7 @@ public class EmployeeController {
 	}
 
 	// Creates/adds a new employee to a client
+	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(path = "/employee/addNewEmployee", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
@@ -100,11 +103,13 @@ public class EmployeeController {
 	}
 
 	// Delete an employee based on his employeeId
-	@PostMapping(path = "/employee/deleteEmployee/{employeeId}", consumes = { MediaType.APPLICATION_JSON_VALUE,
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@DeleteMapping(path = "/employee/{employeeId}", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
-	public EmployeeDetails deleteEmployee(EmployeeDetails employeeDetails, @PathVariable long employeeId) {
-		return employeeService.deleteByEmployeeId(employeeDetails, employeeId);
+	public ResponseEntity<Void> deleteEmployee(@PathVariable long employeeId) {
+		this.employeeService.deleteByEmployeeId(employeeId);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	// Get the list of all Employees of a Client
@@ -113,15 +118,5 @@ public class EmployeeController {
 					MediaType.APPLICATION_XML_VALUE })
 	public List<EmployeeDetails> getAllEmployees() {
 		return employeeService.getAllEmployees();
-	}
-
-	@GetMapping(path = "/hello", produces = "text/plain")
-	public String hello() {
-		return "Hello World";
-	}
-
-	@PostMapping(path = "/hello", produces = "text/plain")
-	public String hellow() {
-		return "Hello World";
 	}
 }

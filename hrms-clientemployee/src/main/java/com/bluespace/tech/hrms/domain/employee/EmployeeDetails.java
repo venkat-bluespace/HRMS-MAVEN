@@ -11,16 +11,11 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.bluespace.tech.hrms.domain.client.Client;
-import com.bluespace.tech.hrms.domain.general.CurrentStatus;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Document
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class EmployeeDetails {
 
 	@Id private ObjectId _id;
@@ -51,7 +46,7 @@ public class EmployeeDetails {
 	private Date terminationDate;
 	private Date employmentLastDate;
 	@DBRef private List<Client> client;
-	@DBRef private List<CurrentStatus> currentStatus;
+	@DBRef private String currentStatus;
 	private String jobTitle;
 	private String organisation;
 	private String department;
@@ -59,10 +54,17 @@ public class EmployeeDetails {
 	private String employmentType;
 	private String employmentStatus;
 	private String reportingManager;
-	private boolean isActive;
+	private boolean active;
 	private Date createdOn;
 	private String createdBy;
 	private Date modifiedOn;
 	private String modifiedBy;
+	
+	public EmployeeDetails(long employeeId, boolean active, String currentStatus) {
+		super();
+		this.employeeId = employeeId;
+		this.active = active;
+		this.currentStatus = currentStatus;
+	}
 	
 }
