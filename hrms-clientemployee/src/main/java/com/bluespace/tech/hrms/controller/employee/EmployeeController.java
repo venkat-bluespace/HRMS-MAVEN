@@ -80,21 +80,22 @@ public class EmployeeController {
 	@GetMapping(path = "/employee/{employeeId}", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
-	public EmployeeDetails getEmployeeById(@PathVariable("employeeId") long id) {
+	public List<EmployeeDetails> getEmployeeById(@PathVariable("employeeId") long id) {
 		return employeeService.getEmployeeById(id);
 	}
 
 	// Update Employee details based on his employeeId
-	@PutMapping(path = "/employee/updateEmployee", consumes = { MediaType.APPLICATION_JSON_VALUE,
+	@PutMapping(path = "/employee/{employeeId}", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
-	public EmployeeDetails saveOrUpdateEmployee(@Validated @RequestBody EmployeeDetails employeeDetails) {
-		return employeeService.updateEmployee(employeeDetails);
+	public EmployeeDetails updateEmployee(@PathVariable("employeeId") long id,
+			@Validated @RequestBody EmployeeDetails employeeDetails) {
+		return employeeService.updateEmployee(id, employeeDetails);
 	}
 
 	// Creates/adds a new employee to a client
 	@ResponseStatus(HttpStatus.CREATED)
-	@PostMapping(path = "/employee/addNewEmployee", consumes = { MediaType.APPLICATION_JSON_VALUE,
+	@PostMapping(path = "/employee/create", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
 	public EmployeeDetails addEmployee(@Validated @RequestBody EmployeeDetails newEmployeeDetails) {
@@ -108,8 +109,10 @@ public class EmployeeController {
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<Void> deleteEmployee(@PathVariable long employeeId) {
-		this.employeeService.deleteByEmployeeId(employeeId);
-		return new ResponseEntity<>(HttpStatus.OK);
+		if(this.employeeService.deleteByEmployeeId(employeeId))
+			return new ResponseEntity<>(HttpStatus.OK);
+		else
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	// Get the list of all Employees of a Client

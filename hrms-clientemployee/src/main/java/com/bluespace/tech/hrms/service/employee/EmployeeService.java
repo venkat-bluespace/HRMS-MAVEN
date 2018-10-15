@@ -8,12 +8,14 @@ public abstract interface EmployeeService {
 
 	public abstract EmployeeDetails createNewEmployee(EmployeeDetails newEmployeeDetails);
 
-	public abstract EmployeeDetails getEmployeeById(long employeeId);
+	public abstract List<EmployeeDetails> getEmployeeById(long employeeId);
 
 	public abstract List<EmployeeDetails> getAllEmployees();
 	
-	public abstract EmployeeDetails updateEmployee(EmployeeDetails employeeDetails);
+	public abstract EmployeeDetails updateEmployee(long id, EmployeeDetails employeeDetails);
 	
-	public abstract void deleteByEmployeeId(long employeeId);
+	/*public abstract EmployeeDetails updateEmployee(long id, EmployeeDetails employeeDetails);*/
+	
+	public abstract boolean deleteByEmployeeId(long employeeId);
 
 }
