@@ -1,42 +1,25 @@
 package com.bluespace.tech.hrms.service.employee;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.http.util.EntityUtils;
-import org.bson.BSONObject;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
 
-import org.springframework.data.mongodb.core.FindAndModifyOptions;
-import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-
-import static org.springframework.data.mongodb.core.query.Query.query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.bluespace.tech.hrms.domain.employee.EmployeeDetails;
 import com.bluespace.tech.hrms.repositories.employee.EmployeeRepository;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.client.FindIterable;
@@ -53,26 +36,28 @@ import static com.mongodb.client.model.Updates.combine;
 public class EmployeeServiceImpl implements EmployeeService {
 
 	private static Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
-	private static long employeeId=0;
+	private static long employeeId = 0;
 
-	@Autowired private EmployeeRepository employeeRepository;	
-	
-	@Autowired private MongoClient mongoClient;
-	
-	private EmployeeDetails employeeDetails;
-	
+	@Autowired
+	private EmployeeRepository employeeRepository;
+
+	@Autowired
+	private MongoClient mongoClient;
+
 	public long getNextSequence() {
 		return employeeId++;
 	}
 
 	public EmployeeDetails createNewEmployee(@ModelAttribute EmployeeDetails newEmployee) {
-		EmployeeDetails newEmployeeDetails=null;
+		EmployeeDetails newEmployeeDetails = null;
+		mongoClient = new MongoClient("localhost", 27017);
+		/*
+		 * MongoDatabase db = mongoClient.getDatabase("hrms"); MongoCollection<Document>
+		 * collection = db.getCollection("employeeDetails");
+		 */
 		try {
-			/*MongoDatabase db = mongoConfig.db();
-			MongoCollection<Document> collection = db.getCollection("employeeDetails");*/
-			
-			long x=getNextSequenceId();
-			
+			long x = getNextSequenceId();
+
 			newEmployee.setEmployeeId(x + 1);
 			Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 			newEmployee.setCreatedOn(currentTime.getTime());
@@ -80,23 +65,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 		} catch (MongoException e) {
 			logger.error("Connection failed due to " + e);
 		} finally {
-//			mongoClient.close();
+			mongoClient.close();
 		}
 
 		return newEmployeeDetails;
 	}
 	
 	public long getNextSequenceId() {
-		org.bson.Document empIdDoc=null;
-		long empId=0;
+		Document empIdDoc = null;
+		long empId = 0;
 		mongoClient = new MongoClient("localhost", 27017);
-		MongoDatabase db =  mongoClient.getDatabase("hrms");
-		
-		MongoCollection<org.bson.Document> collection1 =  db.getCollection("employeeDetails");
-		
-		FindIterable<org.bson.Document> fi= collection1.find().sort(new BasicDBObject( "employeeId" , -1 ) ).limit(1);
-		MongoCursor<org.bson.Document> cursor = fi.iterator();
-		
+		MongoDatabase db = mongoClient.getDatabase("hrms");
+
+		MongoCollection<Document> collection1 = db.getCollection("employeeDetails");
+
+		FindIterable<Document> fi = collection1.find().sort(new BasicDBObject("employeeId", -1)).limit(1);
+		MongoCursor<Document> cursor = fi.iterator();
+
 		while (cursor.hasNext()) {
 			empIdDoc = cursor.tryNext();
 		}
@@ -104,10 +89,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 			empId = (long) empIdDoc.get("employeeId");
 		}
 		return empId;
-	  }
+	}
 
 	@Override
-	public List<EmployeeDetails> getEmployeeById(long employeeId) {
+	public EmployeeDetails getEmployeeById(long employeeId) {
 		return employeeRepository.getEmployeeByEmployeeId(employeeId);
 	}
 
@@ -115,60 +100,84 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public List<EmployeeDetails> getAllEmployees() {
 		return employeeRepository.findAll();
 	}
-
-	public EmployeeDetails updateEmployee(long id, EmployeeDetails employeeDetails) {
-		//List<EmployeeDetails> empDetails = employeeRepository.getEmployeeByEmployeeId(id);
-
-/*		mongoClient = new MongoClient("localhost", 27017);
+	
+/*	@SuppressWarnings("unchecked")
+	@Override
+	public List<EmployeeDetails> updateEmployee(long id, List<EmployeeDetails> employeeDetails) {
+		
+		mongoClient = new MongoClient("localhost", 27017);
 		MongoDatabase db = mongoClient.getDatabase("hrms");
-		MongoCollection<org.bson.Document> collection = db.getCollection("employeeDetails");
-		Bson filter = null;
-		filter = eq("employeeId", id);
-		BSONObject update = new BasicDBObject();
-		MongoCursor<org.bson.Document> cursor = null;
-		FindIterable<org.bson.Document> fi = collection.find(filter).returnKey(true);
-		cursor = fi.iterator(); 
-		while(cursor.hasNext()) {
-			update.putAll(m);
-			
+		MongoCollection<Document> collection = db.getCollection("employeeDetails");
+		ObjectMapper mapper=new ObjectMapper();
+		//Query query = new Query();
+		try {
+			String json = null;
+			Bson filter = eq("employeeId", id);
+			employeeDetails = new ArrayList<EmployeeDetails>();
+			employeeDetails = (List<EmployeeDetails>) new ObjectMapper().readValue(json, EmployeeDetails.class);
+			collection.updateOne(filter, combine(set("employeeDetails", employeeDetails)));
+			return (List<EmployeeDetails>) collection;
+		} catch (Exception e) {
+			logger.error("Unable to find the employee id so failed with exception: "+e);
 		}
-		UpdateResult result = collection.updateOne(filter, (Bson) update); */
 		
-/*		ObjectMapper mapper = new ObjectMapper();
-		String requestEmpDetails = null;
-		EmployeeDetails empInfo = null;*/
-		
-		 
-/*		try {
-			String currentEmpDetails = mapper.readValue
-			requestEmpDetails = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(employeeDetails);
-			empInfo = mapper.readValue(requestEmpDetails, EmployeeDetails.class);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		//String responseEmpDetails = mapper.
-//		mapper.updateValue(employeeDetails, EmployeeDetails.class);
-		//String responseEmpDetails = EntityUtils.
-		//List<EmployeeDetails> empDetails = mapper.readValue(mapper, employeeDetails);
-		
-		return employeeRepository.save(employeeDetails);
-		//return empDetails;
-	}
 
-/*	public EmployeeDetails updateEmployee(long id, EmployeeDetails employeeDetails) {
+		try {
+			Bson filter = eq("employeeId", id);
+			
+		} catch (Exception e) {
+			logger.error("Error in updating employee info, failed with exception: " + e);
+		}
 		return employeeDetails;
 	}*/
+	
+
+	@Override
+	public boolean updateEmployee(long id, @ModelAttribute EmployeeDetails employeeDetails) {
+
+		mongoClient = new MongoClient("localhost", 27017);
+		MongoDatabase db = mongoClient.getDatabase("hrms");
+		MongoCollection<Document> collection = db.getCollection("employeeDetails");
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			Bson filter = null;
+			filter = eq("employeeId", id);
+
+			@SuppressWarnings("unchecked")
+			Map<String, Object> requestMap = mapper.convertValue(employeeDetails, Map.class);
+			List<Bson> combinations = new ArrayList<Bson>();
+
+			for (String key : requestMap.keySet()) {
+				Object value = requestMap.get(key);
+				if (value != null && value != (Integer) 0 && value != (Double) 0.0) {
+					combinations.add(set(key, value));
+				}
+			}
+			Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+			combinations.add(set("employeeId", id));
+			combinations.add(set("modifiedOn", currentTime.getTime()));
+			Bson x = combine(combinations);
+
+			UpdateResult result = collection.updateOne(filter, x);
+			logger.info("No. of documents updated for the Employee Update call is: " + result.getModifiedCount());
+			if (result.getModifiedCount() > 0) {
+				return true;
+			}
+		} catch (Exception e) {
+			logger.error("There was no value found and hence failed with the exception: " + e);
+		} finally {
+			mongoClient.close();
+		}
+		return false;
+	}
 	
 	@Override
 	public boolean deleteByEmployeeId(long employeeId) {
 		mongoClient = new MongoClient("localhost", 27017);
 		MongoDatabase db = mongoClient.getDatabase("hrms");
-		MongoCollection<org.bson.Document> collection = db.getCollection("employeeDetails");
-	
+		MongoCollection<Document> collection = db.getCollection("employeeDetails");
+
 		try {
 			Bson filter = null;
 			Bson query = null;
@@ -181,7 +190,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 			}
 		} catch (Exception e) {
 			logger.error("There's no employee with the provided Employee Id hence failed with the exception: " + e);
+		} finally {
+			mongoClient.close();
 		}
 		return false;
 	}
+
 }
