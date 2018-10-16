@@ -2,8 +2,8 @@ package com.bluespace.tech.hrms.security.util;
 
 import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +34,7 @@ public class MailConfiguration {
 	private String mailDebug;
 	@Value("${mail.bounce.to}")
 	private String bounceAddress;
-	private static final Logger logger = LogManager.getLogger(MailConfiguration.class);
+	private static final Logger logger = LoggerFactory.getLogger(MailConfiguration.class);
 
 	@Bean(name = { "javaMailSender" })
 	public JavaMailSender javaMailSender() {

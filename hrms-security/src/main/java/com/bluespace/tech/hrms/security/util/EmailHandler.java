@@ -6,9 +6,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -22,7 +21,7 @@ public class EmailHandler {
 //	@Autowired
 	private MailConfiguration mailSender;
 
-	private static final Logger logger = LogManager.getLogger(EmailHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(EmailHandler.class);
 
 	public void sendEmailToAdmin(AccountCreationEmail mail) throws IOException {
 		String methodName = "sendEmailToAdmin()";
