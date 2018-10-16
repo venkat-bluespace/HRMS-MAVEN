@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ public class AccountActivationListener implements ApplicationListener<OnRegistra
 	private UserAccountService service;
 	@Autowired
 	private EmailHandler emailHandler;
-	private static final Logger logger = LogManager.getLogger(AccountActivationListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(AccountActivationListener.class);
 
 	@Override
 	public void onApplicationEvent(OnRegistrationCompletionEvent event) {

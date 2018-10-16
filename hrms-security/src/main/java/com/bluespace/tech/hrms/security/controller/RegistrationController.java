@@ -8,8 +8,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +34,7 @@ import com.bluespace.tech.hrms.service.client.ClientService;
 
 public class RegistrationController {
 
-	private static Logger logger = LogManager.getLogger(RegistrationController.class);
+	private static Logger logger = LoggerFactory.getLogger(RegistrationController.class);
 
 	@Autowired
 	private EmailHandler emailHandler;
