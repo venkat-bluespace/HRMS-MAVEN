@@ -1,5 +1,7 @@
 package com.bluespace.tech.hrms.config;
 
+import java.net.UnknownHostException;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -10,7 +12,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -51,6 +55,11 @@ public class MongoConfig extends AbstractMongoConfiguration {
 		MongoClient mongoClient = new MongoClient("localhost", 27017);
 		logger.info("Creating a Mongo instance based on the host and port details provided: " + mongoClient);
 		return mongoClient;
+	}
+	
+	@Bean
+	public MongoDbFactory mongoDBFactory() throws UnknownHostException {
+		return new SimpleMongoDbFactory(new MongoClient("localhost", 27017), "hrms");
 	}
 
 	@Override
