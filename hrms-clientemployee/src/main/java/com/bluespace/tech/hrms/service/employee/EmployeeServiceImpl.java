@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.bluespace.tech.hrms.domain.employee.EmployeeDetails;
+import com.bluespace.tech.hrms.dto.EmployeeDetailsDTO;
+import com.bluespace.tech.hrms.exception.EntityNotFoundException;
+import com.bluespace.tech.hrms.mappers.EmployeeDetailsMapper;
 import com.bluespace.tech.hrms.repositories.employee.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
@@ -93,6 +96,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public EmployeeDetails getEmployeeById(long employeeId) {
+		EmployeeDetails employeeDetails = employeeRepository.getEmployeeByEmployeeId(employeeId);
+		if (employeeDetails == null) {
+			throw new EntityNotFoundException(
+					"There is no record of employee in the system with the id: " + employeeId);
+		}
 		return employeeRepository.getEmployeeByEmployeeId(employeeId);
 	}
 
@@ -133,12 +141,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 	
 
 	@Override
-	public boolean updateEmployee(long id, @ModelAttribute EmployeeDetails employeeDetails) {
+	public boolean updateEmployee(EmployeeDetailsDTO employeeDetails, long id) {
 
 		mongoClient = new MongoClient("localhost", 27017);
 		MongoDatabase db = mongoClient.getDatabase("hrms");
 		MongoCollection<Document> collection = db.getCollection("employeeDetails");
 		ObjectMapper mapper = new ObjectMapper();
+
+		EmployeeDetails empId = employeeRepository.getEmployeeByEmployeeId(id);
+		if (empId == null) {
+			throw new EntityNotFoundException("There is no record of employee in the system with the id: " + id);
+		}
 
 		try {
 			Bson filter = null;
@@ -173,10 +186,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 	
 	@Override
-	public boolean deleteByEmployeeId(long employeeId) {
+	public boolean deleteByEmployeeId(long employeeId) throws EntityNotFoundException {
 		mongoClient = new MongoClient("localhost", 27017);
 		MongoDatabase db = mongoClient.getDatabase("hrms");
 		MongoCollection<Document> collection = db.getCollection("employeeDetails");
+
+		EmployeeDetails empId = employeeRepository.getEmployeeByEmployeeId(employeeId);
+		if (empId == null) {
+			throw new EntityNotFoundException(
+					"There is no record of employee in the system with the id: " + employeeId);
+		}
 
 		try {
 			Bson filter = null;
@@ -184,7 +203,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			filter = eq("employeeId", employeeId);
 			query = combine(set("active", false));
 			UpdateResult result = collection.updateOne(filter, query);
-			logger.info("Documents updated count in Delete Employee call()" + result.getModifiedCount());
+			logger.info("Documents deleted in the Delete Employee call(): " + result.getModifiedCount());
 			if (result.getModifiedCount() > 0) {
 				return true;
 			}
@@ -195,5 +214,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 		}
 		return false;
 	}
+
+/*	@Override
+	public EmployeeDetails createNewEmployee(EmployeeDetailsDTO newEmployeeDetails) {
+		// TODO Auto-generated method stub
+		return null;
+	}*/
 
 }

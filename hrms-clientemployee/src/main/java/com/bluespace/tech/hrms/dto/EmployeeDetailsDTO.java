@@ -1,29 +1,21 @@
-package com.bluespace.tech.hrms.domain.employee;
+package com.bluespace.tech.hrms.dto;
 
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.bson.types.Binary;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.bluespace.tech.hrms.domain.client.Client;
 
 import lombok.Data;
 
-@Document
 @Data
-@CompoundIndexes({ @CompoundIndex(name = "employeeId_index", def = "{'_id': 1 , 'employeeId': 1}", unique = true) })
-public class EmployeeDetails {
-
-	@Id
-	private ObjectId _id;
+public class EmployeeDetailsDTO {
 
 	private long employeeId;
+	@NotNull(message="Invalid Input")
 	private String firstName;
 	private String middleName;
 	private String lastName;
@@ -49,13 +41,8 @@ public class EmployeeDetails {
 	private Date hireDate;
 	private Date terminationDate;
 	private Date employmentLastDate;
-
-	@DBRef
 	private List<Client> client;
-
-	@DBRef
 	private String currentStatus;
-
 	private String jobTitle;
 	private String organisation;
 	private String department;
@@ -68,16 +55,5 @@ public class EmployeeDetails {
 	private String createdBy;
 	private Date modifiedOn;
 	private String modifiedBy;
-
-	public EmployeeDetails(long employeeId, boolean active, String currentStatus) {
-		super();
-		this.employeeId = employeeId;
-		this.active = active;
-		this.currentStatus = currentStatus;
-	}
-
-	public EmployeeDetails() {
-
-	}
-
+	
 }

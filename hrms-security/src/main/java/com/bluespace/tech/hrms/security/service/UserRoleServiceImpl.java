@@ -2,14 +2,11 @@ package com.bluespace.tech.hrms.security.service;
 
 import java.util.List;
 
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import com.bluespace.tech.hrms.security.core.exception.BusinessException;
+//import com.bluespace.tech.hrms.security.core.exception.BusinessException;
 import com.bluespace.tech.hrms.security.domain.UserRole;
-import com.bluespace.tech.hrms.security.domain.UserRoleAuthority;
 import com.bluespace.tech.hrms.security.repositories.UserRoleRepository;
 
 @Service

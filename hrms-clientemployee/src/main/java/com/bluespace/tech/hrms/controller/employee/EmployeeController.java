@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bluespace.tech.hrms.domain.client.Client;
 import com.bluespace.tech.hrms.domain.employee.EmployeeDetails;
+import com.bluespace.tech.hrms.dto.EmployeeDetailsDTO;
+import com.bluespace.tech.hrms.exception.EntityNotFoundException;
 import com.bluespace.tech.hrms.service.employee.EmployeeService;
 import com.mongodb.MongoException;
 
@@ -58,9 +60,9 @@ public class EmployeeController {
 	@PutMapping(path = "/employee/{employeeId}", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
-	public ResponseEntity<Void> updateEmployee(@PathVariable("employeeId") long id,
-			@Validated @RequestBody EmployeeDetails employeeDetails) {
-		if (this.employeeService.updateEmployee(id, employeeDetails))
+	public ResponseEntity<Void> updateEmployee(@Validated @RequestBody EmployeeDetailsDTO employeeDetails,
+			@PathVariable("employeeId") long id) {
+		if (this.employeeService.updateEmployee(employeeDetails, id))
 			return new ResponseEntity<>(HttpStatus.OK);
 		else
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -80,8 +82,8 @@ public class EmployeeController {
 	@PostMapping(path = "/employee/create", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
-	public EmployeeDetails addEmployee(@Validated @RequestBody EmployeeDetails newEmployeeDetails) {
-		newEmployeeDetails = employeeService.createNewEmployee(newEmployeeDetails);
+	public EmployeeDetails addEmployee(@Validated @RequestBody EmployeeDetails employeeDetails) {
+		EmployeeDetails newEmployeeDetails = employeeService.createNewEmployee(employeeDetails);
 		return newEmployeeDetails;
 	}
 
@@ -90,7 +92,7 @@ public class EmployeeController {
 	@DeleteMapping(path = "/employee/{employeeId}", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
-	public ResponseEntity<Void> deleteEmployee(@PathVariable long employeeId) {
+	public ResponseEntity<Void> deleteEmployee(@PathVariable long employeeId) throws EntityNotFoundException {
 		if (this.employeeService.deleteByEmployeeId(employeeId))
 			return new ResponseEntity<>(HttpStatus.OK);
 		else
