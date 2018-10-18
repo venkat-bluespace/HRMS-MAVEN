@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import com.bluespace.tech.hrms.domain.employee.EmployeeDetails;
 import com.bluespace.tech.hrms.dto.EmployeeDetailsDTO;
 import com.bluespace.tech.hrms.exception.EntityNotFoundException;
-import com.bluespace.tech.hrms.mappers.EmployeeDetailsMapper;
 import com.bluespace.tech.hrms.repositories.employee.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
@@ -60,7 +59,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		 */
 		try {
 			long x = getNextSequenceId();
-
+			
 			newEmployee.setEmployeeId(x + 1);
 			Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 			newEmployee.setCreatedOn(currentTime.getTime());
@@ -70,7 +69,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 		} finally {
 			mongoClient.close();
 		}
-
 		return newEmployeeDetails;
 	}
 	

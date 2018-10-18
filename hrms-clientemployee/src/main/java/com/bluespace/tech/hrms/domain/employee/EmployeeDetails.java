@@ -51,7 +51,7 @@ public class EmployeeDetails {
 	private Date employmentLastDate;
 
 	@DBRef
-	private List<Client> client;
+	private Client client;
 
 	@DBRef
 	private String currentStatus;
