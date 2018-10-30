@@ -52,33 +52,24 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	public EmployeeDetails createNewEmployee(@ModelAttribute EmployeeDetails newEmployee) {
 		EmployeeDetails newEmployeeDetails = null;
-		/*mongoClient = new MongoClient("localhost", 27017);*/
-		/*
-		 * MongoDatabase db = mongoClient.getDatabase("hrms"); MongoCollection<Document>
-		 * collection = db.getCollection("employeeDetails");
-		 */
+
 		try {
 			long sequence = getNextSequenceId();
-
 			newEmployee.setEmployeeId(sequence + 1);
 			Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 			newEmployee.setCreatedOn(currentTime.getTime());
 			newEmployeeDetails = employeeRepository.save(newEmployee);
 		} catch (MongoException e) {
 			logger.error("Connection failed due to " + e);
-		} finally {
-			mongoClient.close();
 		}
-
 		return newEmployeeDetails;
 	}
 	
 	public long getNextSequenceId() {
 		Document empIdDoc = null;
 		long empId = 0;
-		/*mongoClient = new MongoClient("localhost", 27017);*/
+		
 		MongoDatabase db = mongoClient.getDatabase("hrms");
-
 		MongoCollection<Document> collection = db.getCollection("employeeDetails");
 
 		FindIterable<Document> fi = collection.find().sort(new BasicDBObject("employeeId", -1)).limit(1);
@@ -142,7 +133,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public boolean updateEmployee(EmployeeDetailsDTO employeeDetails, long id) {
 
-		/*mongoClient = new MongoClient("localhost", 27017);*/
 		MongoDatabase db = mongoClient.getDatabase("hrms");
 		MongoCollection<Document> collection = db.getCollection("employeeDetails");
 		ObjectMapper mapper = new ObjectMapper();
@@ -178,15 +168,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 			}
 		} catch (Exception e) {
 			logger.error("There was no value found and hence failed with the exception: " + e);
-		} finally {
-			mongoClient.close();
 		}
 		return false;
 	}
 	
 	@Override
 	public boolean deleteByEmployeeId(long employeeId) throws EntityNotFoundException {
-		mongoClient = new MongoClient("localhost", 27017);
 		MongoDatabase db = mongoClient.getDatabase("hrms");
 		MongoCollection<Document> collection = db.getCollection("employeeDetails");
 
@@ -208,8 +195,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 			}
 		} catch (Exception e) {
 			logger.error("There's no employee with the provided Employee Id hence failed with the exception: " + e);
-		} finally {
-			mongoClient.close();
 		}
 		return false;
 	}
