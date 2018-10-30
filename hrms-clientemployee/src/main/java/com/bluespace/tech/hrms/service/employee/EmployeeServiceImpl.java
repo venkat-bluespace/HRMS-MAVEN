@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import com.bluespace.tech.hrms.domain.employee.EmployeeDetails;
 import com.bluespace.tech.hrms.dto.EmployeeDetailsDTO;
 import com.bluespace.tech.hrms.exception.EntityNotFoundException;
-import com.bluespace.tech.hrms.mappers.EmployeeDetailsMapper;
 import com.bluespace.tech.hrms.repositories.employee.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
@@ -53,15 +52,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	public EmployeeDetails createNewEmployee(@ModelAttribute EmployeeDetails newEmployee) {
 		EmployeeDetails newEmployeeDetails = null;
-		mongoClient = new MongoClient("localhost", 27017);
+		/*mongoClient = new MongoClient("localhost", 27017);*/
 		/*
 		 * MongoDatabase db = mongoClient.getDatabase("hrms"); MongoCollection<Document>
 		 * collection = db.getCollection("employeeDetails");
 		 */
 		try {
-			long x = getNextSequenceId();
+			long sequence = getNextSequenceId();
 
-			newEmployee.setEmployeeId(x + 1);
+			newEmployee.setEmployeeId(sequence + 1);
 			Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 			newEmployee.setCreatedOn(currentTime.getTime());
 			newEmployeeDetails = employeeRepository.save(newEmployee);
@@ -77,12 +76,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public long getNextSequenceId() {
 		Document empIdDoc = null;
 		long empId = 0;
-		mongoClient = new MongoClient("localhost", 27017);
+		/*mongoClient = new MongoClient("localhost", 27017);*/
 		MongoDatabase db = mongoClient.getDatabase("hrms");
 
-		MongoCollection<Document> collection1 = db.getCollection("employeeDetails");
+		MongoCollection<Document> collection = db.getCollection("employeeDetails");
 
-		FindIterable<Document> fi = collection1.find().sort(new BasicDBObject("employeeId", -1)).limit(1);
+		FindIterable<Document> fi = collection.find().sort(new BasicDBObject("employeeId", -1)).limit(1);
 		MongoCursor<Document> cursor = fi.iterator();
 
 		while (cursor.hasNext()) {
@@ -143,7 +142,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public boolean updateEmployee(EmployeeDetailsDTO employeeDetails, long id) {
 
-		mongoClient = new MongoClient("localhost", 27017);
+		/*mongoClient = new MongoClient("localhost", 27017);*/
 		MongoDatabase db = mongoClient.getDatabase("hrms");
 		MongoCollection<Document> collection = db.getCollection("employeeDetails");
 		ObjectMapper mapper = new ObjectMapper();
@@ -159,20 +158,20 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 			@SuppressWarnings("unchecked")
 			Map<String, Object> requestMap = mapper.convertValue(employeeDetails, Map.class);
-			List<Bson> combinations = new ArrayList<Bson>();
+			List<Bson> setCriteria = new ArrayList<Bson>();
 
 			for (String key : requestMap.keySet()) {
 				Object value = requestMap.get(key);
 				if (value != null && value != (Integer) 0 && value != (Double) 0.0) {
-					combinations.add(set(key, value));
+					setCriteria.add(set(key, value));
 				}
 			}
 			Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-			combinations.add(set("employeeId", id));
-			combinations.add(set("modifiedOn", currentTime.getTime()));
-			Bson x = combine(combinations);
+			setCriteria.add(set("employeeId", id));
+			setCriteria.add(set("modifiedOn", currentTime.getTime()));
+			Bson query = combine(setCriteria);
 
-			UpdateResult result = collection.updateOne(filter, x);
+			UpdateResult result = collection.updateOne(filter, query);
 			logger.info("No. of documents updated for the Employee Update call is: " + result.getModifiedCount());
 			if (result.getModifiedCount() > 0) {
 				return true;
