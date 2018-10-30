@@ -1,7 +1,6 @@
 package com.bluespace.tech.hrms.domain.employee;
 
 import java.util.Date;
-import java.util.List;
 
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
